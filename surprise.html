@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hold me close 💚</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Dancing+Script:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:           #4a5a3a;
+      --card-border:  #7c8f60;
+      --timeline-item:#6b7d52;
+      --timeline-img: #3d4e2e;
+      --text-light:   #f5f0e8;
+      --text-muted:   #d4cbb8;
+      --accent:       #c8a84b;
+      --accent-light: #e2c97e;
+      --btn-bg:       #8b6914;
+      --photo-bg:     #3d4e2e;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 20% 15%, rgba(200,168,75,0.10) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 85%, rgba(40,60,20,0.35) 0%, transparent 50%);
+      font-family: 'Lato', sans-serif;
+      color: var(--text-light);
+      overflow-x: hidden;
+    }
+
+    .leaf {
+      position: fixed;
+      pointer-events: none;
+      animation: floatLeaf linear infinite;
+      opacity: 0.13;
+      z-index: 0;
+    }
+    @keyframes floatLeaf {
+      0%   { transform: translateY(105vh) rotate(0deg);   opacity: 0; }
+      8%   { opacity: 0.13; }
+      92%  { opacity: 0.13; }
+      100% { transform: translateY(-10vh) rotate(420deg); opacity: 0; }
+    }
+
+    /* ══════════════════════════════
+       TIMELINE
+    ══════════════════════════════ */
+    .timeline-container {
+      position: relative;
+      z-index: 1;
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 56px 24px 72px;
+      text-align: center;
+    }
+    .tl-eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+    .timeline-container h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 3rem;
+      color: var(--text-light);
+      margin-bottom: 48px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      opacity: 0;
+      animation: fadeUp 0.65s ease 0.22s forwards;
+    }
+    .tl-thread {
+      position: absolute;
+      left: 50%; top: 170px; bottom: 130px;
+      width: 2px;
+      transform: translateX(-50%);
+      background: linear-gradient(to bottom, transparent, var(--accent) 12%, var(--accent) 88%, transparent);
+      opacity: 0.28;
+    }
+    .timeline-item {
+      position: relative;
+      background: var(--timeline-item);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.07);
+      text-align: left;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .timeline-item.visible { opacity: 1; transform: translateY(0); }
+    .timeline-item::before {
+      content: '✦';
+      position: absolute;
+      left: 50%; top: -22px;
+      transform: translateX(-50%);
+      color: var(--accent);
+      font-size: 14px;
+    }
+    .timeline-item img {
+      width: 100%; border-radius: 16px; object-fit: cover;
+      max-height: 450px; display: block; margin-bottom: 14px;
+      background: var(--timeline-img);
+    }
+    .img-placeholder {
+      width: 100%; height: 160px; border-radius: 16px;
+      background: var(--timeline-img);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+      color: rgba(200,168,75,0.4);
+      font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; gap: 8px;
+    }
+    .tl-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .tl-date {
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); background: rgba(200,168,75,0.12);
+      border-radius: 30px; padding: 3px 12px;
+    }
+    .timeline-item p {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.25rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .timeline-item p strong { color: var(--text-light); }
+
+    .glow-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 16px 48px;
+      font-family: 'Lato', sans-serif;
+      font-size: 1.05rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      border: none; border-radius: 50px;
+      background: linear-gradient(135deg, var(--btn-bg), var(--accent));
+      color: #fff; cursor: pointer;
+      opacity: 0;
+      transition: transform 0.2s;
+    }
+    .glow-btn.visible {
+      animation: glowPulse 2s ease-in-out infinite alternate, fadeUp 0.65s ease forwards;
+    }
+    .glow-btn:hover { transform: translateY(-3px); }
+
+    @keyframes glowPulse {
+      from { box-shadow: 0 0 14px rgba(200,168,75,0.35); }
+      to   { box-shadow: 0 0 32px rgba(200,168,75,0.75), 0 0 60px rgba(200,168,75,0.25); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══════════════════════════════
+       GREETING CARD OVERLAY
+    ══════════════════════════════ */
+
+    /* Dark backdrop — scales in from nothing, like original */
+    .boxMail {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 18, 6, 0.92);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.3);
+      transition: opacity 0.5s, transform 0.5s, visibility 0.5s;
+      z-index: 100000;
+    }
+    .boxMail.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1);
+    }
+
+    .boxMail .close-btn {
+      position: absolute;
+      top: 30px; right: 40px;
+      font-size: 32px; line-height: 1;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color 0.2s, transform 0.2s;
+      z-index: 10;
+      user-select: none;
+    }
+    .boxMail .close-btn:hover { color: var(--accent-light); transform: rotate(90deg); }
+
+    /*
+      boxMail-container:
+      - Sets the perspective so child panels can do 3D transforms
+      - The whole container rotates -5deg + glows on hover (original behaviour)
+    */
+    .boxMail-container {
+      position: relative;
+      width: 750px;
+      height: 500px;
+      perspective: 2000px;
+      -webkit-perspective: 2000px;
+      transition: transform 0.5s ease, filter 0.5s ease;
+      transform: translateX(-25%);
+    }
+    .boxMail-container:hover {
+      transform: rotate(-5deg);
+      filter: drop-shadow(0 0 18px rgba(200,168,75,0.6));
+    }
+
+    /*
+      CARD 1 — the COVER (left half)
+      ─────────────────────────────
+      Positioned on the left half.
+      transform-origin: left center  →  hinges from its own left edge.
+      On hover it rotateY(-140deg)   →  flips open like a book page.
+    */
+    .boxMail-container .card1 {
+      position: absolute;
+      top: 0; right: 0;
+      width: 50%; height: 100%;
+
+      background: linear-gradient(150deg, #5a4010 0%, #b8922e 50%, var(--accent-light) 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+
+      border: 1px solid rgba(0,0,0,0.3);
+      border-radius: 16px 0 0 16px;
+
+    
+
+      /* THE flip pivot — must be on the left edge */
+      transform-origin: left center;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 1s ease-in-out;
+      z-index: 2;    /* on top of card2 until flipped */
+    }
+
+    /* Subtle shimmer */
+    .boxMail-container .card1::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 35% 28%, rgba(255,255,255,0.15) 0%, transparent 62%);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    /* Corner decoration */
+    .boxMail-container .card1::after {
+      content: '✦';
+      position: absolute;
+      bottom: 18px; right: 18px;
+      font-size: 32px;
+      color: rgba(255,255,255,0.14);
+      transform: rotate(15deg);
+    }
+
+    /* HOVER → swing the cover open */
+    .boxMail-container:hover .card1 {
+      transform: rotateY(-140deg);
+     }
+
+    .boxMail-container .card1 .userImg {
+      width: 84px; height: 84px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--photo-bg);
+      border: 3px solid rgba(255,255,255,0.55);
+      box-shadow: 0 0 0 5px rgba(255,255,255,0.14), 0 6px 18px rgba(0,0,0,0.3);
+      flex-shrink: 0;
+    }
+    .boxMail-container .card1 .userImg img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .boxMail-container .card1 .to-name {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.78);
+    }
+    .boxMail-container .card1 h3 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 38px;
+      text-transform: uppercase;
+      width: 80%;
+      text-align: center;
+      line-height: 1.4;
+      letter-spacing: 4px;
+      transform: rotate(-5deg);
+      text-shadow: 0 0 6px rgba(255,255,255,0.7), 0 0 18px rgba(255,255,255,0.3);
+    }
+
+    /*
+      CARD 2 — the INSIDE LETTER (right half)
+      ────────────────────────────────────────
+      Sits behind card1 (z-index: 1).
+      Revealed once card1 flips away.
+      .card2-content slides diagonally on hover.
+    */
+    .boxMail-container .card2 {
+      position: absolute;
+      top: 0; right: 0;
+      width: 50%; height: 100%;
+
+      background: #2e3d20;
+      border: 1px solid rgba(0,0,0,0.3);
+      border-radius: 0 16px 16px 0;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .boxMail-container .card2 .card2-content {
+      position: relative;
+      width: 100%; height: 100%;
+      background: linear-gradient(145deg, #4a5a3a, #5e7045 70%);
+      overflow: hidden;
+      color: var(--text-light);
+      transition: transform 1s ease, box-shadow 1s ease;
+    }
+
+    /* Slide diagonally when hovered — mirrors original translate(20px,20px) */
+    .boxMail-container:hover .card2-content {
+      transform: translate(16px, 16px);
+      box-shadow: -3px -3px 12px rgba(0,0,0,0.45);
+    }
+
+    /* Ruled-paper lines */
+    .boxMail-container .card2 .card2-content::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 30px,
+        rgba(200,168,75,0.055) 30px, rgba(200,168,75,0.055) 31px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Gold top line */
+    .boxMail-container .card2 .card2-content::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      z-index: 1;
+    }
+
+    /* "To You!" — slides in (padding-left grows), triggered when card2 hovered */
+    .boxMail-container .card2 h3 {
+      position: relative; z-index: 2;
+      font-family: 'Dancing Script', cursive;
+      font-size: 24px;
+      color: var(--accent-light);
+      text-shadow: 0 0 10px rgba(200,168,75,0.4);
+      padding: 24px 0 10px 60px;
+      opacity: 0;
+      visibility: hidden;
+    }
+    .boxMail-container .card2:hover h3 {
+      animation: texth3 1.5s forwards;
+      animation-delay: 0.5s;
+    }
+    @keyframes texth3 {
+      0%   { opacity: 1; visibility: visible; padding-left: 60px; }
+      100% { opacity: 1; visibility: visible; padding-left: 152px; }
+    }
+
+    /* Birthday message — fades in */
+    .boxMail-container .card2 h2 {
+      position: relative; z-index: 2;
+      font-family: 'Dancing Script', cursive;
+      font-size: 17px;
+      padding: 0 24px;
+      text-indent: 20px;
+      color: var(--text-muted);
+      line-height: 1.85;
+      opacity: 0;
+    }
+    .boxMail-container .card2:hover h2 {
+      animation: texth2 1.5s forwards;
+      animation-delay: 1s;
+    }
+    @keyframes texth2 {
+      0%   { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* Wandering leaf — mirrors original cute2 image */
+    .boxMail-container .card2 .card2-content .imageCute2 {
+      position: absolute;
+      top: 8px; left: 20px;
+      font-size: 26px;
+      opacity: 0;
+      z-index: 3;
+    }
+    .boxMail-container .card2 .card2-content:hover .imageCute2 {
+      animation: cute3 1s linear infinite, cute4 3s 2s forwards;
+      animation-delay: 2s;
+    }
+    @keyframes cute3 {
+      0%   { transform: rotate(0deg); }
+      25%  { transform: rotate(5deg); }
+      50%  { transform: rotate(0deg); }
+      75%  { transform: rotate(-5deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes cute4 {
+      0%   { left: 20px; opacity: 1; }
+      100% { left: 100px; opacity: 1; }
+    }
+
+    /* Mobile: stack vertically, disable 3D */
+@media (max-width: 820px) {
+
+  /* Container becomes vertical on mobile */
+  .boxMail-container {
+    width: 92vw;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    perspective: none;
+    transform: none;
+  }
+
+  /* Both pages take full width */
+  .boxMail-container .card1,
+  .boxMail-container .card2 {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+
+  /* Cover page (top) */
+  .boxMail-container .card1 {
+    height: 260px;
+  }
+
+  /* Inside page – FIX FOR CUT TEXT */
+  .boxMail-container .card2 {
+    height: auto;
+    overflow: visible;
+    display: none; /* hidden until opened */
+  }
+
+  /* Show message when card is opened */
+  .boxMail.active .boxMail-container .card2 {
+    display: block;
+    margin-top: 16px;
+  }
+
+  /* Allow scrolling for long text */
+  .boxMail-container .card2 .card2-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Disable all hover-based animations on mobile */
+  .boxMail-container:hover,
+  .boxMail-container:hover .card1,
+  .boxMail-container:hover .card2-content {
+    transform: none;
+  }
+
+  .boxMail-container.open .card1 {
+    transform: translateY(-20px);
+    opacity: 0.85;
+  }
+
+
+}
+
+  </style>
+</head>
+<body>
+
+<script>
+  const syms = ['♥️']
+  for (let i = 0; i < 12; i++) {
+    const el = document.createElement('div');
+    el.className = 'leaf';
+    el.textContent = syms[i % syms.length];
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.fontSize = (13 + Math.random() * 11) + 'px';
+    el.style.animationDuration = (11 + Math.random() * 15) + 's';
+    el.style.animationDelay  = (Math.random() * 13) + 's';
+    document.body.appendChild(el);
+  }
+</script>
+
+<!-- ════════ TIMELINE ════════ -->
+<div class="timeline-container">
+
+  <div class="tl-eyebrow">✦ Always Shining brighter than a star ✦</div>
+  <h1> Down the memory lane ✨</h1>
+  <div class="tl-thread"></div>
+
+  <div class="timeline-item">
+    <img src="WhatsApp Image 2026-02-16 at 8.47.06 PM.jpeg" alt="Memory 1"
+         onerror="this.outerHTML='<div class=&quot;img-placeholder&quot;>📷 Add Photo</div>'"/>
+    <div class="tl-meta"><span class="tl-date">24 May 2025</span></div>
+    <p>My living <strong>Goddess</strong> 🙇🏻‍♂️</p>
+  </div>
+
+  <div class="timeline-item">
+    <img src="WhatsApp Image 2026-02-16 at 9.32.58 PM.jpeg" alt="Memory 2"
+         onerror="this.outerHTML='<div class=&quot;img-placeholder&quot;>📷 Add Photo</div>'"/>
+    <div class="tl-meta"><span class="tl-date">20 March 2025</span></div>
+    <p>OMG <strong>sweet</strong> as hell 😩</p>
+  </div>
+
+  <div class="timeline-item">
+    <img src="WhatsApp Image 2026-02-16 at 9.19.47 PM.jpeg" alt="Memory 2"
+         onerror="this.outerHTML='<div class=&quot;img-placeholder&quot;>📷 Add Photo</div>'"/>
+    <div class="tl-meta"><span class="tl-date">8 July 2025</span></div>
+    <p>Us having <strong>fun</strong> is my favourite hobby 😎</p>
+  </div>
+
+  <div class="timeline-item">
+    <img src="WhatsApp Image 2026-02-16 at 8.47.07 PM.jpeg" alt="Memory 3"
+         onerror="this.outerHTML='<div class=&quot;img-placeholder&quot;>📷 Add Photo</div>'"/>
+    <div class="tl-meta"><span class="tl-date">11 Dec 2025</span></div>
+    <p>We are <strong>closer</strong> than ever yk 💗</p>
+  </div>
+
+  <button class="glow-btn" onclick="openCard()">Need your touch ✨</button>
+
+</div>
+
+
+<!-- ════════ GREETING CARD OVERLAY ════════ -->
+<div class="boxMail" id="cardBox">
+
+  <span class="close-btn" onclick="closeCard()">✕</span>
+
+  <div class="boxMail-container">
+
+    <!-- LEFT panel — the cover, flips open on hover -->
+    <div class="card1">
+      <div class="userImg">
+        <!-- ✏️ Replace with your avatar image -->
+        <img src="WhatsApp Image 2026-02-16 at 10.08.34 PM.jpeg" alt="Avatar"
+             onerror="this.style.display='none'"/>
+      </div>
+      <span class="to-name">To My PRIYADARSHINI 💖</span>
+      <h3>Happy<br>Birthday LOVE♥️</h3>
+    </div>
+
+    <!-- RIGHT panel — inside letter, revealed when card1 flips open -->
+    <div class="card2">
+      <div class="card2-content">
+
+        <div class="imageCute2">🌿</div>
+
+        <!-- ✏️ Edit your message below -->
+        <h3>From Your Manmit✨</h3>
+        <h2>
+          A very happy birthday to you my dear, I pray to god for your perfect health and wish you all the best for your future endeavours.
+          You will do fantastic in life I just know that and you will always have me by your side as your greatest supporter🫂🩷.
+          Priyadarshini you are the most precious being in my life I LOVE YOU and ADMIRE YOU for the person you are, 
+          you make me the happiest dear, I am so proud of you. You have changed me so much women, 
+          you are my peace at tough times, you are the hope I cling to whenever I feel down, 
+          I trust you with my life. Stay healty, enjoy life, great things are coming your way🫂
+
+    
+          
+          
+        </h2>
+
+      </div>
+    </div>
+
+  </div><!-- /boxMail-container -->
+
+</div><!-- /boxMail -->
+
+
+<script>
+  function openCard() {
+    document.getElementById('cardBox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCard() {
+    document.getElementById('cardBox').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  /* Close on backdrop click */
+  document.getElementById('cardBox').addEventListener('click', function(e) {
+    if (e.target === this) closeCard();
+  });
+
+  /* Scroll-reveal timeline items */
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.timeline-item').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.15) + 's';
+    obs.observe(el);
+  });
+
+  /* Glow button reveal on scroll */
+  const btn = document.querySelector('.glow-btn');
+  const bObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) { btn.classList.add('visible'); bObs.unobserve(btn); }
+  }, { threshold: 0.4 });
+  bObs.observe(btn);
+</script>
+
+<script>
+  function openCard() {
+    const box = document.getElementById('cardBox');
+    const container = box.querySelector('.boxMail-container');
+
+    box.classList.add('active');
+    container.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCard() {
+    const box = document.getElementById('cardBox');
+    const container = box.querySelector('.boxMail-container');
+
+    box.classList.remove('active');
+    container.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  /* Close when clicking backdrop */
+  document.getElementById('cardBox').addEventListener('click', function(e) {
+    if (e.target === this) closeCard();
+  });
+</script>
+
+
+</body>
+</html>
